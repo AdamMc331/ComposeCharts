@@ -1,4 +1,4 @@
-package template
+package com.adammcneilly.compose.charts
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,13 +8,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import template.theme.TemplateTheme
+import com.adammcneilly.compose.charts.theme.ChartsSampleTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TemplateTheme {
+            ChartsSampleTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colorScheme.background) {
                     Greeting("Android")
@@ -32,7 +32,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    TemplateTheme {
+    ChartsSampleTheme {
         Greeting("Android")
     }
 }
