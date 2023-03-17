@@ -28,9 +28,9 @@ fun BarChart(
     modifier: Modifier = Modifier,
     inset: Dp = 8.dp,
     axisColor: Color = Color.Black,
-    segmentPadding: Dp = 8.dp,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
-    lineWidth: Dp = 32.dp,
+    lineWidth: Dp = 48.dp,
+
 ) {
     Canvas(
         modifier = modifier,
@@ -43,7 +43,6 @@ fun BarChart(
             )
 
             drawSegments(
-                segmentPadding = segmentPadding,
                 segments = segments,
                 yAxisRange = yAxisRange,
                 horizontalArrangement = horizontalArrangement,
@@ -54,7 +53,6 @@ fun BarChart(
 }
 
 private fun DrawScope.drawSegments(
-    segmentPadding: Dp,
     segments: List<BarChartSegment>,
     yAxisRange: Float,
     horizontalArrangement: Arrangement.Horizontal,
