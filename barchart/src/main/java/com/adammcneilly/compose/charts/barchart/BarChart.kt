@@ -3,6 +3,7 @@ package com.adammcneilly.compose.charts.barchart
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -11,8 +12,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /**
@@ -27,6 +31,7 @@ fun BarChart(
     inset: Dp = 8.dp,
     axisColor: Color = Color.Black,
     segmentPadding: Dp = 8.dp,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
 ) {
     Canvas(
         modifier = modifier,
@@ -38,39 +43,88 @@ fun BarChart(
                 axisColor = axisColor,
             )
 
-            val segmentPaddingPx = segmentPadding.toPx()
-            // Will need to revisit and calculate based on available width.
-            val lineWidth = 32.dp.toPx()
-
-            // Our starting X offset is the initial spacing (from the axis),
-            // plus half the width of our first line.
-            var currentSegmentXOffset = segmentPaddingPx + (lineWidth / 2)
-
-            segments.forEach { segment ->
-                val segmentPercentageOfRange = (segment.value / yAxisRange)
-                val availableSpace = (size.height)
-                val percentageToFill = segmentPercentageOfRange * availableSpace
-                val yOffset = (availableSpace - percentageToFill)
-
-                drawLine(
-                    color = segment.color,
-                    start = Offset(
-                        x = currentSegmentXOffset,
-                        y = size.height,
-                    ),
-                    end = Offset(
-                        x = currentSegmentXOffset,
-                        y = yOffset,
-                    ),
-                    strokeWidth = lineWidth,
-                )
-
-                // After every segment is drawn, move our x cursor the equivalent
-                // of one bar, plus the spacing in between.
-                currentSegmentXOffset += (lineWidth + segmentPaddingPx)
-            }
+            drawSegments(
+                segmentPadding = segmentPadding,
+                segments = segments,
+                yAxisRange = yAxisRange,
+                horizontalArrangement = horizontalArrangement,
+            )
         }
     }
+}
+
+private fun DrawScope.drawSegments(
+    segmentPadding: Dp,
+    segments: List<BarChartSegment>,
+    yAxisRange: Float,
+    horizontalArrangement: Arrangement.Horizontal,
+) {
+    // If start, we can do what we have below.
+    // If end, we can consider "reversing" the order, or, just pre calculate our initial
+    // x offset.
+    // If center, we need to calculate our "used" width, and then set start offset based on that
+    // If Spaced between, start offset is the same, but middle line is drawn differently.
+
+    val sizes = IntArray(segments.size) {
+        32.dp.toPx().toInt()
+    }
+
+    val outPositions = IntArray(segments.size)
+
+    with (horizontalArrangement) {
+        this@drawSegments.arrange(
+            totalSize = size.width.toInt(),
+            sizes = sizes,
+            layoutDirection = LayoutDirection.Ltr,
+            outPositions = outPositions,
+        )
+    }
+
+    val segmentPaddingPx = segmentPadding.toPx()
+    // Will need to revisit and calculate based on available width.
+    val lineWidth = 32.dp.toPx()
+
+    // Our starting X offset is the initial spacing (from the axis),
+    // plus half the width of our first line.
+//    var currentSegmentXOffset = segmentPaddingPx + (lineWidth / 2)
+
+    segments.forEachIndexed { index, segment ->
+        drawSegment(
+            segment = segment,
+            yAxisRange = yAxisRange,
+            currentSegmentXOffset = outPositions[index].toFloat() + (lineWidth / 2),
+            lineWidth = lineWidth,
+        )
+
+        // After every segment is drawn, move our x cursor the equivalent
+        // of one bar, plus the spacing in between.
+//        currentSegmentXOffset += (lineWidth + segmentPaddingPx)
+    }
+}
+
+private fun DrawScope.drawSegment(
+    segment: BarChartSegment,
+    yAxisRange: Float,
+    currentSegmentXOffset: Float,
+    lineWidth: Float,
+) {
+    val segmentPercentageOfRange = (segment.value / yAxisRange)
+    val availableSpace = (size.height)
+    val percentageToFill = segmentPercentageOfRange * availableSpace
+    val yOffset = (availableSpace - percentageToFill)
+
+    drawLine(
+        color = segment.color,
+        start = Offset(
+            x = currentSegmentXOffset,
+            y = size.height,
+        ),
+        end = Offset(
+            x = currentSegmentXOffset,
+            y = yOffset,
+        ),
+        strokeWidth = lineWidth,
+    )
 }
 
 private fun DrawScope.drawAxis(
