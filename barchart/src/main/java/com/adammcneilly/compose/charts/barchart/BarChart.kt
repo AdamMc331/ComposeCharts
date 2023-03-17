@@ -30,7 +30,6 @@ fun BarChart(
     axisColor: Color = Color.Black,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
     lineWidth: Dp = 48.dp,
-
 ) {
     Canvas(
         modifier = modifier,
