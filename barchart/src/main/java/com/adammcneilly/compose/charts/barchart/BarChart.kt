@@ -12,8 +12,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -31,7 +29,8 @@ fun BarChart(
     inset: Dp = 8.dp,
     axisColor: Color = Color.Black,
     segmentPadding: Dp = 8.dp,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
+    lineWidth: Dp = 32.dp,
 ) {
     Canvas(
         modifier = modifier,
@@ -48,6 +47,7 @@ fun BarChart(
                 segments = segments,
                 yAxisRange = yAxisRange,
                 horizontalArrangement = horizontalArrangement,
+                lineWidthPx = lineWidth.toPx(),
             )
         }
     }
@@ -58,21 +58,16 @@ private fun DrawScope.drawSegments(
     segments: List<BarChartSegment>,
     yAxisRange: Float,
     horizontalArrangement: Arrangement.Horizontal,
+    lineWidthPx: Float,
 ) {
-    // If start, we can do what we have below.
-    // If end, we can consider "reversing" the order, or, just pre calculate our initial
-    // x offset.
-    // If center, we need to calculate our "used" width, and then set start offset based on that
-    // If Spaced between, start offset is the same, but middle line is drawn differently.
-
     val sizes = IntArray(segments.size) {
-        32.dp.toPx().toInt()
+        lineWidthPx.toInt()
     }
 
     val outPositions = IntArray(segments.size)
 
     with (horizontalArrangement) {
-        this@drawSegments.arrange(
+        arrange(
             totalSize = size.width.toInt(),
             sizes = sizes,
             layoutDirection = LayoutDirection.Ltr,
@@ -80,25 +75,15 @@ private fun DrawScope.drawSegments(
         )
     }
 
-    val segmentPaddingPx = segmentPadding.toPx()
-    // Will need to revisit and calculate based on available width.
-    val lineWidth = 32.dp.toPx()
-
-    // Our starting X offset is the initial spacing (from the axis),
-    // plus half the width of our first line.
-//    var currentSegmentXOffset = segmentPaddingPx + (lineWidth / 2)
-
     segments.forEachIndexed { index, segment ->
         drawSegment(
             segment = segment,
             yAxisRange = yAxisRange,
-            currentSegmentXOffset = outPositions[index].toFloat() + (lineWidth / 2),
-            lineWidth = lineWidth,
+            // For each segment, we want to shift it half a line width
+            // so that the "center" of a line, is right where the offset was calculated.
+            currentSegmentXOffset = outPositions[index].toFloat() + (lineWidthPx / 2),
+            lineWidth = lineWidthPx,
         )
-
-        // After every segment is drawn, move our x cursor the equivalent
-        // of one bar, plus the spacing in between.
-//        currentSegmentXOffset += (lineWidth + segmentPaddingPx)
     }
 }
 
