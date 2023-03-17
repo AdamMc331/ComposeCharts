@@ -18,10 +18,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
-/**
- * Consider adding a requirement that none of the segment values are greater than
- * the supplied [yAxisRange].
- */
 @Composable
 fun BarChart(
     segments: List<BarChartSegment>,
@@ -32,6 +28,15 @@ fun BarChart(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
     lineWidth: Dp = 48.dp,
 ) {
+    val maxSegmentValue = segments.maxOf { segment ->
+        segment.value
+    }
+
+    require(maxSegmentValue >= yAxisRange) {
+        "yAxisRange parameter cannot be smaller than the largest segment value. " +
+            "Supplied yAxisRange: $yAxisRange, maxSegmentValue: $maxSegmentValue"
+    }
+
     val layoutDirection = LocalLayoutDirection.current
 
     Canvas(
