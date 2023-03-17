@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 rootProject.name = "Compose Charts"
 include(":app")
 include(":piechart")
+include(":barchart")
