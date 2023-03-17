@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -31,6 +32,8 @@ fun BarChart(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
     lineWidth: Dp = 48.dp,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
+
     Canvas(
         modifier = modifier,
     ) {
@@ -46,6 +49,7 @@ fun BarChart(
                 yAxisRange = yAxisRange,
                 horizontalArrangement = horizontalArrangement,
                 lineWidthPx = lineWidth.toPx(),
+                layoutDirection = layoutDirection,
             )
         }
     }
@@ -56,6 +60,7 @@ private fun DrawScope.drawSegments(
     yAxisRange: Float,
     horizontalArrangement: Arrangement.Horizontal,
     lineWidthPx: Float,
+    layoutDirection: LayoutDirection,
 ) {
     val sizes = IntArray(segments.size) {
         lineWidthPx.toInt()
@@ -67,7 +72,7 @@ private fun DrawScope.drawSegments(
         arrange(
             totalSize = size.width.toInt(),
             sizes = sizes,
-            layoutDirection = LayoutDirection.Ltr,
+            layoutDirection = layoutDirection,
             outPositions = outPositions,
         )
     }
