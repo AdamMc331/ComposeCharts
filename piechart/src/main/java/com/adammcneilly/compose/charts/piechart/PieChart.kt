@@ -9,26 +9,35 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+private const val FULL_CIRCLE_ANGLE = 360F
+
 @Composable
 fun PieChart(
+    segments: List<PieChartSegment>,
     modifier: Modifier = Modifier,
 ) {
     Canvas(
         modifier = modifier,
     ) {
-        drawArc(
-            color = Color.Red,
-            startAngle = 0F,
-            sweepAngle = 225F,
-            useCenter = true,
-        )
+        var currentStartAngle = 0F
 
-        drawArc(
-            color = Color.Blue,
-            startAngle = 225F,
-            sweepAngle = 135F,
-            useCenter = true,
-        )
+        val sumValues = segments
+            .sumOf(PieChartSegment::value)
+            .toFloat()
+
+        segments.forEach { segment ->
+            val segmentPercentage = (segment.value / sumValues)
+            val segmentSweepAngle = (segmentPercentage * FULL_CIRCLE_ANGLE)
+
+            drawArc(
+                color = segment.color,
+                startAngle = currentStartAngle,
+                sweepAngle = segmentSweepAngle,
+                useCenter = true,
+            )
+
+            currentStartAngle += segmentSweepAngle
+        }
     }
 }
 
@@ -42,7 +51,13 @@ fun PieChart(
 )
 @Composable
 private fun PieChartPreview() {
+    val segments = listOf(
+        PieChartSegment("Wins", 10, Color.Green),
+        PieChartSegment("Losses", 5, Color.Red),
+    )
+
     PieChart(
+        segments = segments,
         modifier = Modifier
             .size(96.dp),
     )
