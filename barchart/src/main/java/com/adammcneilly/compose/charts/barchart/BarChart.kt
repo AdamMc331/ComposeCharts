@@ -10,86 +10,87 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun BarChart(
+    segments: List<BarChartSegment>,
     modifier: Modifier = Modifier,
+    inset: Dp = 8.dp,
+    axisColor: Color = Color.Black,
+    segmentPadding: Dp = 8.dp,
 ) {
     Canvas(
         modifier = modifier,
     ) {
-        drawAxis()
+        inset(
+            inset = inset.toPx()
+        ) {
+            drawAxis(
+                axisColor = axisColor,
+            )
 
-        drawLine(
-            color = Color.Red,
-            start = Offset(
-                x = 24.dp.toPx(),
-                y = (size.height - 8.dp.toPx()),
-            ),
-            end = Offset(
-                x = 24.dp.toPx(),
-                y = 8.dp.toPx(),
-            ),
-            strokeWidth = 16.dp.toPx(),
-        )
+            val segmentPaddingPx = segmentPadding.toPx()
+            // Will need to revisit and calculate based on available width.
+            val lineWidth = 32.dp.toPx()
 
-        drawLine(
-            color = Color.Blue,
-            start = Offset(
-                x = 48.dp.toPx(),
-                y = (size.height - 8.dp.toPx()),
-            ),
-            end = Offset(
-                x = 48.dp.toPx(),
-                y = (size.height / 2),
-            ),
-            strokeWidth = 16.dp.toPx(),
-        )
+            // Our starting X offset is the initial spacing (from the axis),
+            // plus half the width of our first line.
+            var currentSegmentXOffset = segmentPaddingPx + (lineWidth / 2)
 
-        drawLine(
-            color = Color.Green,
-            start = Offset(
-                x = 72.dp.toPx(),
-                y = (size.height - 8.dp.toPx()),
-            ),
-            end = Offset(
-                x = 72.dp.toPx(),
-                y = (size.height / 4),
-            ),
-            strokeWidth = 16.dp.toPx(),
-        )
+            segments.forEach { segment ->
+                drawLine(
+                    color = segment.color,
+                    start = Offset(
+                        x = currentSegmentXOffset,
+                        y = size.height,
+                    ),
+                    end = Offset(
+                        x = currentSegmentXOffset,
+                        // Need to calculate based on all values
+                        y = 0F,
+                    ),
+                    strokeWidth = lineWidth,
+                )
+
+                // After every segment is drawn, move our x cursor the equivalent
+                // of one bar, plus the spacing in between.
+                currentSegmentXOffset += (lineWidth + segmentPaddingPx)
+            }
+        }
     }
 }
 
-private fun DrawScope.drawAxis() {
-    val paddingToAxis = 8.dp.toPx()
-
+private fun DrawScope.drawAxis(
+    axisColor: Color,
+) {
     val yAxisStartOffset = Offset(
-        x = paddingToAxis,
-        y = paddingToAxis,
+        x = 0F,
+        y = 0F,
     )
 
     val xAxisEndOffset = Offset(
-        x = (size.width - paddingToAxis),
-        y = (size.height - paddingToAxis),
+        x = size.width,
+        y = size.height,
     )
 
     val axisConnectionOffset = Offset(
-        x = paddingToAxis,
-        y = (size.height - paddingToAxis),
+        x = 0F,
+        y = size.height,
     )
 
 
     drawLine(
-        color = Color.Black,
+        color = axisColor,
         start = yAxisStartOffset,
         end = axisConnectionOffset,
     )
 
     drawLine(
-        color = Color.Black,
+        color = axisColor,
         start = axisConnectionOffset,
         end = xAxisEndOffset,
     )
@@ -105,7 +106,14 @@ private fun DrawScope.drawAxis() {
 )
 @Composable
 private fun BarChartPreview() {
+    val segments = listOf(
+        BarChartSegment("Bar One", 5, Color.Red),
+        BarChartSegment("Bar Two", 10, Color.Blue),
+        BarChartSegment("Bar Three", 7, Color.Green)
+    )
+
     BarChart(
+        segments = segments,
         modifier = Modifier
             .background(
                 color = Color.White,
