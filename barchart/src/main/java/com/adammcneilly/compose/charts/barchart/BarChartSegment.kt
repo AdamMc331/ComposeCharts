@@ -7,6 +7,6 @@ import androidx.compose.ui.graphics.Color
  */
 data class BarChartSegment(
     val name: String,
-    val value: Int,
+    val value: Float,
     val color: Color,
 )

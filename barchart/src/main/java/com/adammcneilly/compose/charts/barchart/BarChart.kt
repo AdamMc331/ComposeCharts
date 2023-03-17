@@ -15,9 +15,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/**
+ * Consider adding a requirement that none of the segment values are greater than
+ * the supplied [yAxisRange].
+ */
 @Composable
 fun BarChart(
     segments: List<BarChartSegment>,
+    yAxisRange: Float,
     modifier: Modifier = Modifier,
     inset: Dp = 8.dp,
     axisColor: Color = Color.Black,
@@ -42,6 +47,11 @@ fun BarChart(
             var currentSegmentXOffset = segmentPaddingPx + (lineWidth / 2)
 
             segments.forEach { segment ->
+                val segmentPercentageOfRange = (segment.value / yAxisRange)
+                val availableSpace = (size.height)
+                val percentageToFill = segmentPercentageOfRange * availableSpace
+                val yOffset = (availableSpace - percentageToFill)
+
                 drawLine(
                     color = segment.color,
                     start = Offset(
@@ -50,8 +60,7 @@ fun BarChart(
                     ),
                     end = Offset(
                         x = currentSegmentXOffset,
-                        // Need to calculate based on all values
-                        y = 0F,
+                        y = yOffset,
                     ),
                     strokeWidth = lineWidth,
                 )
@@ -107,13 +116,14 @@ private fun DrawScope.drawAxis(
 @Composable
 private fun BarChartPreview() {
     val segments = listOf(
-        BarChartSegment("Bar One", 5, Color.Red),
-        BarChartSegment("Bar Two", 10, Color.Blue),
-        BarChartSegment("Bar Three", 7, Color.Green)
+        BarChartSegment("Bar One", 5F, Color.Red),
+        BarChartSegment("Bar Two", 10F, Color.Blue),
+        BarChartSegment("Bar Three", 8F, Color.Green)
     )
 
     BarChart(
         segments = segments,
+        yAxisRange = 10F,
         modifier = Modifier
             .background(
                 color = Color.White,
