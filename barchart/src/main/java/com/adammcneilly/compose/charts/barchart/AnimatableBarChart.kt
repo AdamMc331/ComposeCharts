@@ -1,6 +1,7 @@
 package com.adammcneilly.compose.charts.barchart
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.tween
@@ -17,10 +18,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun AnimatableBarChart(
-    segments: List<BarChartSegment>,
-    yAxisRange: Float,
+    config: BarChartConfig,
     modifier: Modifier = Modifier,
-    config: BarChartConfig = BarChartConfig(),
+    animationDurationMillis: Int = 1000,
+    animationSpec: AnimationSpec<Float> = tween(
+        durationMillis = animationDurationMillis,
+    ),
 ) {
     val animationPercentage = remember {
         AnimationState(0F)
@@ -29,15 +32,11 @@ fun AnimatableBarChart(
     LaunchedEffect(Unit) {
         animationPercentage.animateTo(
             targetValue = 1F,
-            animationSpec = tween(
-                durationMillis = 1000,
-            ),
+            animationSpec = animationSpec,
         )
     }
 
     BarChart(
-        segments = segments,
-        yAxisRange = yAxisRange,
         config = config,
         animationPercentage = animationPercentage.value,
         modifier = modifier,
@@ -61,9 +60,12 @@ private fun AnimatableBarChartPreview() {
         BarChartSegment("Bar Four", 8F, Color.Magenta),
     )
 
-    AnimatableBarChart(
+    val config = BarChartConfig(
         segments = segments,
-        yAxisRange = 10F,
+    )
+
+    AnimatableBarChart(
+        config = config,
         modifier = Modifier
             .background(
                 color = Color.White,
