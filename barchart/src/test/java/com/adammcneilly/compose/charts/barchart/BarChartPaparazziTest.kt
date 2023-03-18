@@ -1,5 +1,6 @@
 package com.adammcneilly.compose.charts.barchart
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
@@ -112,6 +113,60 @@ class BarChartPaparazziTest {
                 config = config,
                 modifier = Modifier
                     .fillMaxWidth(),
+            )
+        }
+    }
+
+    @Test
+    fun barChartQuarterAnimation() {
+        val config = BarChartConfig(
+            segments = segments,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        )
+
+        paparazzi.snapshot {
+            BarChart(
+                config = config,
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .fillMaxWidth(),
+                animationPercentage = 0.25F,
+            )
+        }
+    }
+
+    @Test
+    fun barChartHalfAnimation() {
+        val config = BarChartConfig(
+            segments = segments,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        )
+
+        paparazzi.snapshot {
+            BarChart(
+                config = config,
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .fillMaxWidth(),
+                animationPercentage = 0.5F,
+            )
+        }
+    }
+
+    @Test
+    fun barChartThreeQuarterAnimation() {
+        val config = BarChartConfig(
+            segments = segments,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        )
+
+        paparazzi.snapshot {
+            BarChart(
+                config = config,
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .fillMaxWidth(),
+                animationPercentage = 0.75F,
             )
         }
     }
