@@ -27,6 +27,7 @@ fun BarChart(
     axisColor: Color = Color.Black,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
     lineWidth: Dp = 48.dp,
+    animationPercentage: Float = 1F,
 ) {
     val maxSegmentValue = segments.maxOf { segment ->
         segment.value
@@ -55,6 +56,7 @@ fun BarChart(
                 horizontalArrangement = horizontalArrangement,
                 lineWidthPx = lineWidth.toPx(),
                 layoutDirection = layoutDirection,
+                animationPercentage = animationPercentage,
             )
         }
     }
@@ -66,6 +68,7 @@ private fun DrawScope.drawSegments(
     horizontalArrangement: Arrangement.Horizontal,
     lineWidthPx: Float,
     layoutDirection: LayoutDirection,
+    animationPercentage: Float,
 ) {
     val sizes = IntArray(segments.size) {
         lineWidthPx.toInt()
@@ -90,6 +93,7 @@ private fun DrawScope.drawSegments(
             // so that the "center" of a line, is right where the offset was calculated.
             currentSegmentXOffset = outPositions[index].toFloat() + (lineWidthPx / 2),
             lineWidth = lineWidthPx,
+            animationPercentage = animationPercentage,
         )
     }
 }
@@ -99,10 +103,11 @@ private fun DrawScope.drawSegment(
     yAxisRange: Float,
     currentSegmentXOffset: Float,
     lineWidth: Float,
+    animationPercentage: Float,
 ) {
     val segmentPercentageOfRange = (segment.value / yAxisRange)
     val availableSpace = (size.height)
-    val percentageToFill = segmentPercentageOfRange * availableSpace
+    val percentageToFill = segmentPercentageOfRange * availableSpace * animationPercentage
     val yOffset = (availableSpace - percentageToFill)
 
     drawLine(
@@ -176,5 +181,34 @@ private fun BarChartPreview() {
             )
             .fillMaxWidth()
             .height(144.dp),
+    )
+}
+
+@Preview(
+    name = "Day Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Preview(
+    name = "Night Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun AnimatingBarChartPreview() {
+    val segments = listOf(
+        BarChartSegment("Bar One", 5F, Color.Red),
+        BarChartSegment("Bar Two", 10F, Color.Blue),
+        BarChartSegment("Bar Three", 8F, Color.Green)
+    )
+
+    BarChart(
+        segments = segments,
+        yAxisRange = 10F,
+        modifier = Modifier
+            .background(
+                color = Color.White,
+            )
+            .fillMaxWidth()
+            .height(144.dp),
+        animationPercentage = 0.5F
     )
 }
