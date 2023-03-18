@@ -24,7 +24,7 @@ fun BarChart(
         modifier = modifier,
     ) {
         inset(
-            inset = config.inset.toPx()
+            inset = config.inset.toPx(),
         ) {
             drawAxis(
                 axisColor = config.axisColor,
@@ -48,7 +48,7 @@ private fun DrawScope.drawSegments(
 
     val outPositions = IntArray(config.segments.size)
 
-    with (config.horizontalArrangement) {
+    with(config.horizontalArrangement) {
         arrange(
             totalSize = size.width.toInt(),
             sizes = sizes,
@@ -114,7 +114,6 @@ private fun DrawScope.drawAxis(
         y = size.height,
     )
 
-
     drawLine(
         color = axisColor,
         start = yAxisStartOffset,
@@ -141,7 +140,7 @@ private fun BarChartPreview() {
     val segments = listOf(
         BarChartSegment("Bar One", 5F, Color.Red),
         BarChartSegment("Bar Two", 10F, Color.Blue),
-        BarChartSegment("Bar Three", 8F, Color.Green)
+        BarChartSegment("Bar Three", 8F, Color.Green),
     )
 
     val config = BarChartConfig(
@@ -172,7 +171,7 @@ private fun AnimatingBarChartPreview() {
     val segments = listOf(
         BarChartSegment("Bar One", 5F, Color.Red),
         BarChartSegment("Bar Two", 10F, Color.Blue),
-        BarChartSegment("Bar Three", 8F, Color.Green)
+        BarChartSegment("Bar Three", 8F, Color.Green),
     )
 
     val config = BarChartConfig(
@@ -187,6 +186,6 @@ private fun AnimatingBarChartPreview() {
             )
             .fillMaxWidth()
             .height(144.dp),
-        animationPercentage = 0.5F
+        animationPercentage = 0.5F,
     )
 }
