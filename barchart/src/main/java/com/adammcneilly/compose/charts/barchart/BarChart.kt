@@ -23,10 +23,7 @@ fun BarChart(
     segments: List<BarChartSegment>,
     yAxisRange: Float,
     modifier: Modifier = Modifier,
-    inset: Dp = 8.dp,
-    axisColor: Color = Color.Black,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
-    lineWidth: Dp = 48.dp,
+    config: BarChartConfig = BarChartConfig(),
     animationPercentage: Float = 1F,
 ) {
     val maxSegmentValue = segments.maxOf { segment ->
@@ -44,17 +41,17 @@ fun BarChart(
         modifier = modifier,
     ) {
         inset(
-            inset = inset.toPx()
+            inset = config.inset.toPx()
         ) {
             drawAxis(
-                axisColor = axisColor,
+                axisColor = config.axisColor,
             )
 
             drawSegments(
                 segments = segments,
                 yAxisRange = yAxisRange,
-                horizontalArrangement = horizontalArrangement,
-                lineWidthPx = lineWidth.toPx(),
+                horizontalArrangement = config.horizontalArrangement,
+                lineWidthPx = config.lineWidth.toPx(),
                 layoutDirection = layoutDirection,
                 animationPercentage = animationPercentage,
             )

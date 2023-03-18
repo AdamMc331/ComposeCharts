@@ -5,7 +5,6 @@ import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -14,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -22,10 +20,7 @@ fun AnimatableBarChart(
     segments: List<BarChartSegment>,
     yAxisRange: Float,
     modifier: Modifier = Modifier,
-    inset: Dp = 8.dp,
-    axisColor: Color = Color.Black,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
-    lineWidth: Dp = 48.dp,
+    config: BarChartConfig = BarChartConfig(),
 ) {
     val animationPercentage = remember {
         AnimationState(0F)
@@ -43,10 +38,7 @@ fun AnimatableBarChart(
     BarChart(
         segments = segments,
         yAxisRange = yAxisRange,
-        inset = inset,
-        axisColor = axisColor,
-        horizontalArrangement = horizontalArrangement,
-        lineWidth = lineWidth,
+        config = config,
         animationPercentage = animationPercentage.value,
         modifier = modifier,
     )
