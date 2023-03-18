@@ -35,8 +35,6 @@ fun BarChart(
             "Supplied yAxisRange: $yAxisRange, maxSegmentValue: $maxSegmentValue"
     }
 
-    val layoutDirection = LocalLayoutDirection.current
-
     Canvas(
         modifier = modifier,
     ) {
@@ -50,9 +48,7 @@ fun BarChart(
             drawSegments(
                 segments = segments,
                 yAxisRange = yAxisRange,
-                horizontalArrangement = config.horizontalArrangement,
-                lineWidthPx = config.lineWidth.toPx(),
-                layoutDirection = layoutDirection,
+                config = config,
                 animationPercentage = animationPercentage,
             )
         }
@@ -62,18 +58,16 @@ fun BarChart(
 private fun DrawScope.drawSegments(
     segments: List<BarChartSegment>,
     yAxisRange: Float,
-    horizontalArrangement: Arrangement.Horizontal,
-    lineWidthPx: Float,
-    layoutDirection: LayoutDirection,
+    config: BarChartConfig,
     animationPercentage: Float,
 ) {
     val sizes = IntArray(segments.size) {
-        lineWidthPx.toInt()
+        config.lineWidth.toPx().toInt()
     }
 
     val outPositions = IntArray(segments.size)
 
-    with (horizontalArrangement) {
+    with (config.horizontalArrangement) {
         arrange(
             totalSize = size.width.toInt(),
             sizes = sizes,
@@ -88,8 +82,8 @@ private fun DrawScope.drawSegments(
             yAxisRange = yAxisRange,
             // For each segment, we want to shift it half a line width
             // so that the "center" of a line, is right where the offset was calculated.
-            currentSegmentXOffset = outPositions[index].toFloat() + (lineWidthPx / 2),
-            lineWidth = lineWidthPx,
+            currentSegmentXOffset = outPositions[index].toFloat() + (config.lineWidth.toPx() / 2),
+            lineWidth = config.lineWidth.toPx(),
             animationPercentage = animationPercentage,
         )
     }
