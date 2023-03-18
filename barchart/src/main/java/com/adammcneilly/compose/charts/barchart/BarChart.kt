@@ -3,7 +3,6 @@ package com.adammcneilly.compose.charts.barchart
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
@@ -12,68 +11,44 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun BarChart(
-    segments: List<BarChartSegment>,
-    yAxisRange: Float,
+    config: BarChartConfig,
     modifier: Modifier = Modifier,
-    inset: Dp = 8.dp,
-    axisColor: Color = Color.Black,
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.SpaceEvenly,
-    lineWidth: Dp = 48.dp,
+    animationPercentage: Float = 1F,
 ) {
-    val maxSegmentValue = segments.maxOf { segment ->
-        segment.value
-    }
-
-    require(maxSegmentValue >= yAxisRange) {
-        "yAxisRange parameter cannot be smaller than the largest segment value. " +
-            "Supplied yAxisRange: $yAxisRange, maxSegmentValue: $maxSegmentValue"
-    }
-
-    val layoutDirection = LocalLayoutDirection.current
-
     Canvas(
         modifier = modifier,
     ) {
         inset(
-            inset = inset.toPx()
+            inset = config.inset.toPx()
         ) {
             drawAxis(
-                axisColor = axisColor,
+                axisColor = config.axisColor,
             )
 
             drawSegments(
-                segments = segments,
-                yAxisRange = yAxisRange,
-                horizontalArrangement = horizontalArrangement,
-                lineWidthPx = lineWidth.toPx(),
-                layoutDirection = layoutDirection,
+                config = config,
+                animationPercentage = animationPercentage,
             )
         }
     }
 }
 
 private fun DrawScope.drawSegments(
-    segments: List<BarChartSegment>,
-    yAxisRange: Float,
-    horizontalArrangement: Arrangement.Horizontal,
-    lineWidthPx: Float,
-    layoutDirection: LayoutDirection,
+    config: BarChartConfig,
+    animationPercentage: Float,
 ) {
-    val sizes = IntArray(segments.size) {
-        lineWidthPx.toInt()
+    val sizes = IntArray(config.segments.size) {
+        config.lineWidth.toPx().toInt()
     }
 
-    val outPositions = IntArray(segments.size)
+    val outPositions = IntArray(config.segments.size)
 
-    with (horizontalArrangement) {
+    with (config.horizontalArrangement) {
         arrange(
             totalSize = size.width.toInt(),
             sizes = sizes,
@@ -82,14 +57,15 @@ private fun DrawScope.drawSegments(
         )
     }
 
-    segments.forEachIndexed { index, segment ->
+    config.segments.forEachIndexed { index, segment ->
         drawSegment(
             segment = segment,
-            yAxisRange = yAxisRange,
+            yAxisRange = config.yAxisRange,
             // For each segment, we want to shift it half a line width
             // so that the "center" of a line, is right where the offset was calculated.
-            currentSegmentXOffset = outPositions[index].toFloat() + (lineWidthPx / 2),
-            lineWidth = lineWidthPx,
+            currentSegmentXOffset = outPositions[index].toFloat() + (config.lineWidth.toPx() / 2),
+            lineWidth = config.lineWidth.toPx(),
+            animationPercentage = animationPercentage,
         )
     }
 }
@@ -99,10 +75,11 @@ private fun DrawScope.drawSegment(
     yAxisRange: Float,
     currentSegmentXOffset: Float,
     lineWidth: Float,
+    animationPercentage: Float,
 ) {
     val segmentPercentageOfRange = (segment.value / yAxisRange)
     val availableSpace = (size.height)
-    val percentageToFill = segmentPercentageOfRange * availableSpace
+    val percentageToFill = segmentPercentageOfRange * availableSpace * animationPercentage
     val yOffset = (availableSpace - percentageToFill)
 
     drawLine(
@@ -167,14 +144,49 @@ private fun BarChartPreview() {
         BarChartSegment("Bar Three", 8F, Color.Green)
     )
 
-    BarChart(
+    val config = BarChartConfig(
         segments = segments,
-        yAxisRange = 10F,
+    )
+
+    BarChart(
+        config = config,
         modifier = Modifier
             .background(
                 color = Color.White,
             )
             .fillMaxWidth()
             .height(144.dp),
+    )
+}
+
+@Preview(
+    name = "Day Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Preview(
+    name = "Night Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun AnimatingBarChartPreview() {
+    val segments = listOf(
+        BarChartSegment("Bar One", 5F, Color.Red),
+        BarChartSegment("Bar Two", 10F, Color.Blue),
+        BarChartSegment("Bar Three", 8F, Color.Green)
+    )
+
+    val config = BarChartConfig(
+        segments = segments,
+    )
+
+    BarChart(
+        config = config,
+        modifier = Modifier
+            .background(
+                color = Color.White,
+            )
+            .fillMaxWidth()
+            .height(144.dp),
+        animationPercentage = 0.5F
     )
 }
