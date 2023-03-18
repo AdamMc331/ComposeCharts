@@ -1,6 +1,8 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("app.cash.paparazzi")
+    id("org.jmailen.kotlinter")
 }
 
 android {
@@ -38,7 +40,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.0"
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 }
 
