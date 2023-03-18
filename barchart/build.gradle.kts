@@ -1,29 +1,26 @@
 plugins {
-    id("com.android.application")
-    id("kotlin-android")
-    id("org.jmailen.kotlinter")
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
+    namespace = "com.adammcneilly.compose.charts.barchart"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.adammcneilly.compose.charts"
         minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.compileSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -43,12 +40,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.3.0"
     }
-
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
 }
 
 dependencies {
@@ -57,21 +48,10 @@ dependencies {
     debugImplementation(composeBom)
     androidTestImplementation(composeBom)
 
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.android.material)
+    implementation(libs.compose.foundation)
     implementation(libs.compose.ui)
-    implementation(libs.compose.material)
     implementation(libs.compose.ui.tooling)
-
     testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.test.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
-    androidTestImplementation(libs.compose.ui.test.junit)
-
-    debugImplementation(libs.compose.ui.test.manifest)
-    debugImplementation(libs.compose.ui.tooling)
 }
