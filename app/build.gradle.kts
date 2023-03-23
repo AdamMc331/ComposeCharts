@@ -57,6 +57,7 @@ dependencies {
     debugImplementation(composeBom)
     androidTestImplementation(composeBom)
 
+    implementation(project(":piechart"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
