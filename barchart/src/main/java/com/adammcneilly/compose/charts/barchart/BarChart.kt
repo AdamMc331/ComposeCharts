@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.adammcneilly.compose.charts.barchart
 
 import android.content.res.Configuration
@@ -11,8 +13,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.inset
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import kotlin.math.min
 
 @Composable
 fun BarChart(
@@ -20,6 +29,8 @@ fun BarChart(
     modifier: Modifier = Modifier,
     animationPercentage: Float = 1F,
 ) {
+    val textMeasurer = rememberTextMeasurer()
+
     Canvas(
         modifier = modifier,
     ) {
@@ -33,6 +44,7 @@ fun BarChart(
             drawSegments(
                 config = config,
                 animationPercentage = animationPercentage,
+                textMeasurer = textMeasurer,
             )
         }
     }
@@ -41,6 +53,7 @@ fun BarChart(
 private fun DrawScope.drawSegments(
     config: BarChartConfig,
     animationPercentage: Float,
+    textMeasurer: TextMeasurer,
 ) {
     val sizes = IntArray(config.segments.size) {
         config.lineWidth.toPx().toInt()
@@ -66,6 +79,7 @@ private fun DrawScope.drawSegments(
             currentSegmentXOffset = outPositions[index].toFloat() + (config.lineWidth.toPx() / 2),
             lineWidth = config.lineWidth.toPx(),
             animationPercentage = animationPercentage,
+            textMeasurer = textMeasurer,
         )
     }
 }
@@ -76,11 +90,23 @@ private fun DrawScope.drawSegment(
     currentSegmentXOffset: Float,
     lineWidth: Float,
     animationPercentage: Float,
+    textMeasurer: TextMeasurer,
 ) {
+    val textLayoutResult = textMeasurer.measure(
+        text = AnnotatedString(segment.name),
+        constraints = Constraints(
+            maxWidth = lineWidth.toInt(),
+        ),
+    )
+
     val segmentPercentageOfRange = (segment.value / yAxisRange)
     val availableSpace = (size.height)
     val percentageToFill = segmentPercentageOfRange * availableSpace * animationPercentage
     val yOffset = (availableSpace - percentageToFill)
+
+    val textWidth = textLayoutResult.size.width
+    val centerOfText = textWidth / 2
+    val xPosition = currentSegmentXOffset - centerOfText
 
     drawLine(
         color = segment.color,
@@ -90,9 +116,17 @@ private fun DrawScope.drawSegment(
         ),
         end = Offset(
             x = currentSegmentXOffset,
-            y = yOffset,
+            y = min(yOffset + textLayoutResult.size.height, size.height),
         ),
         strokeWidth = lineWidth,
+    )
+
+    drawText(
+        textLayoutResult = textLayoutResult,
+        topLeft = Offset(
+            x = xPosition,
+            y = min(yOffset, size.height - textLayoutResult.size.height),
+        ),
     )
 }
 
@@ -138,9 +172,9 @@ private fun DrawScope.drawAxis(
 @Composable
 private fun BarChartPreview() {
     val segments = listOf(
-        BarChartSegment("Bar One", 5F, Color.Red),
-        BarChartSegment("Bar Two", 10F, Color.Blue),
-        BarChartSegment("Bar Three", 8F, Color.Green),
+        BarChartSegment("One", 5F, Color.Red),
+        BarChartSegment("Two", 10F, Color.Blue),
+        BarChartSegment("Three", 8F, Color.Green),
     )
 
     val config = BarChartConfig(
@@ -169,9 +203,9 @@ private fun BarChartPreview() {
 @Composable
 private fun AnimatingBarChartPreview() {
     val segments = listOf(
-        BarChartSegment("Bar One", 5F, Color.Red),
-        BarChartSegment("Bar Two", 10F, Color.Blue),
-        BarChartSegment("Bar Three", 8F, Color.Green),
+        BarChartSegment("One", 5F, Color.Red),
+        BarChartSegment("Two", 10F, Color.Blue),
+        BarChartSegment("Three", 8F, Color.Green),
     )
 
     val config = BarChartConfig(
