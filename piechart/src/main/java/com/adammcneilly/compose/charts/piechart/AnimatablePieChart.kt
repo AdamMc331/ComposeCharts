@@ -19,10 +19,11 @@ import androidx.compose.ui.unit.dp
 fun AnimatablePieChart(
     segments: List<PieChartSegment>,
     modifier: Modifier = Modifier,
-    animationDurationMillis: Int = 2000,
+    animationDurationMillis: Int = 1000,
     animationSpec: AnimationSpec<Float> = tween(
         durationMillis = animationDurationMillis,
     ),
+    segmentStyle: PieChartSegmentStyle = PieChartSegmentStyle.Filled,
 ) {
     val animationPercentage = remember {
         AnimationState(0F)
@@ -39,6 +40,7 @@ fun AnimatablePieChart(
         segments = segments,
         animationPercentage = animationPercentage.value,
         modifier = modifier,
+        segmentStyle = segmentStyle,
     )
 }
 
