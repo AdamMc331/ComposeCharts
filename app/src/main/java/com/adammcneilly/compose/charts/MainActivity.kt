@@ -30,7 +30,7 @@ import com.adammcneilly.compose.charts.piechart.PieChartSegmentStyle
 import com.adammcneilly.compose.charts.theme.ChartsSampleTheme
 import kotlin.random.Random
 
-@Suppress("MagicNumber, LongMethod")
+@Suppress("MagicNumber", "LongMethod")
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
