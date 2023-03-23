@@ -25,11 +25,11 @@ fun AnimatablePieChart(
     ),
     segmentStyle: PieChartSegmentStyle = PieChartSegmentStyle.Filled,
 ) {
-    val animationPercentage = remember(segments.size) {
+    val animationPercentage = remember(segments.size, segmentStyle) {
         AnimationState(0F)
     }
 
-    LaunchedEffect(segments.size) {
+    LaunchedEffect(segments.size, segmentStyle) {
         animationPercentage.animateTo(
             targetValue = 1F,
             animationSpec = animationSpec,
