@@ -3,12 +3,30 @@ package com.adammcneilly.compose.charts
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.adammcneilly.compose.charts.piechart.AnimatablePieChart
+import com.adammcneilly.compose.charts.piechart.PieChartSegment
 import com.adammcneilly.compose.charts.theme.ChartsSampleTheme
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,22 +35,63 @@ class MainActivity : ComponentActivity() {
             ChartsSampleTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        val segmentCount = remember { mutableStateOf(3) }
+
+                        AnimatablePieChart(
+                            segments = List(segmentCount.value) {
+                                PieChartSegment(
+                                    name = "Segment $it",
+                                    value = Random.nextInt(500),
+                                    color = Color(
+                                        red = Random.nextInt(255),
+                                        green = Random.nextInt(255),
+                                        blue = Random.nextInt(255),
+                                    ),
+                                )
+                            },
+                            modifier = Modifier
+                                .size(96.dp),
+                        )
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    segmentCount.value = segmentCount.value - 1
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                )
+                            }
+
+                            Text(
+                                "Segments: ${segmentCount.value}",
+                            )
+
+                            IconButton(
+                                onClick = {
+                                    segmentCount.value = segmentCount.value + 1
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowUp,
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ChartsSampleTheme {
-        Greeting("Android")
     }
 }
