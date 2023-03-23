@@ -20,6 +20,7 @@ fun PieChart(
     segments: List<PieChartSegment>,
     modifier: Modifier = Modifier,
     segmentStyle: PieChartSegmentStyle = PieChartSegmentStyle.Filled,
+    animationPercentage: Float = 1F,
 ) {
     Canvas(
         modifier = modifier,
@@ -30,16 +31,42 @@ fun PieChart(
             .sumOf(PieChartSegment::value)
             .toFloat()
 
+        val angleToRender = (animationPercentage * FULL_CIRCLE_ANGLE)
+
+        // Given the animation percentage, determine how much of the circle we will
+        // need to draw.
+        // Based on that, for each segment, we will either
+        // 1. Draw the whole segment, if it's less than the animation point
+        // 2. Draw a portion of the segment, if the animation point is in the middle
+        // of this section.
+        // 3. Or, we don't draw the segment at all, because that portion of the circle
+        // shouldn't be rendered yet.
         segments.forEach { segment ->
             val segmentPercentage = (segment.value / sumValues)
             val segmentSweepAngle = (segmentPercentage * FULL_CIRCLE_ANGLE)
+            val totalAngleAfterDrawing = (segmentSweepAngle + currentStartAngle)
 
-            drawSegment(
-                segment = segment,
-                startAngle = currentStartAngle,
-                sweepAngle = segmentSweepAngle,
-                style = segmentStyle,
-            )
+            val shouldRenderWholeSegment = (totalAngleAfterDrawing <= angleToRender)
+            val shouldNotRender = (currentStartAngle > angleToRender)
+
+            if (shouldNotRender) {
+                // Don't do anything
+            } else {
+                // Calculate the angle to draw, based on whether it's partial or full
+                // segment.
+                val sweepAngleToUse = if (shouldRenderWholeSegment) {
+                    segmentSweepAngle
+                } else {
+                    (angleToRender - currentStartAngle)
+                }
+
+                drawSegment(
+                    segment = segment,
+                    startAngle = currentStartAngle,
+                    sweepAngle = sweepAngleToUse,
+                    style = segmentStyle,
+                )
+            }
 
             currentStartAngle += segmentSweepAngle
         }
@@ -123,5 +150,31 @@ private fun OutlinedPieChartPreview() {
         modifier = Modifier
             .size(96.dp)
             .padding(8.dp),
+    )
+}
+
+@Preview(
+    name = "Day Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Preview(
+    name = "Night Mode",
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun OutlinedAnimatingPieChartPreview() {
+    val segments = listOf(
+        PieChartSegment("Blah", 2, Color.Blue),
+        PieChartSegment("Wins", 10, Color.Green),
+        PieChartSegment("Losses", 5, Color.Red),
+    )
+
+    PieChart(
+        segments = segments,
+        segmentStyle = PieChartSegmentStyle.Outlined(8.dp),
+        modifier = Modifier
+            .size(96.dp)
+            .padding(8.dp),
+        animationPercentage = 0.5F,
     )
 }
